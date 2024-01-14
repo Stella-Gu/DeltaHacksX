@@ -4,7 +4,7 @@
 *                            *
 ******************************/
 
-let photo = false;
+let photo, locationValue = false;
 
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
       backbutton = document.getElementById('backbutton');
       submit = document.getElementById('submit');
       note = document.getElementById('note');
+      recycle = document.getElementById('recycle');
 
       navigator.mediaDevices.getUserMedia({ video: true, audio: false })
           .then(function (stream) {
@@ -93,6 +94,8 @@ document.addEventListener('DOMContentLoaded', function () {
       photo.style.display = 'none';
       note.style.display = 'none';
       
+      recycle.style.display = 'none';
+      garbage.style.display = 'none';
       sortCategory.style.display = 'none';
       highestConfidence.style.display = 'none';
   }
@@ -157,6 +160,13 @@ async function init() {
 
     sortCategory = document.getElementById("sort-category");
 
+    let location = document.getElementById("location");
+    let locationSelect = document.getElementById("locationSelect");
+    locationValue = locationSelect.options[locationSelect.selectedIndex].value;
+    // var text = location.options[location.selectedIndex].text;
+    //location.innerHTML = value;
+    console.log(locationValue);
+
     await predict();
 }
 
@@ -215,14 +225,25 @@ async function predict() {
     itemCategoryMap.set("beverage_bottles", "recycling");
     itemCategoryMap.set("shampoo_bottles", "recycling");
     itemCategoryMap.set("clear_cd_dvd_cases", "recycling");
+    if (locationValue == "hamilton") {
+        itemCategoryMap.set("clear_cd_dvd_cases", "garbage");
+    }
     // itemCategoryMap.set("soft_plastics", "recycling");
     itemCategoryMap.set("plastic_foil_wrappers", "garbage");
     itemCategoryMap.set("hot_drink_cups", "garbage");
     itemCategoryMap.set("metal_cans", "recycling");
     itemCategoryMap.set("paper_products", "recycling");
 
+    console.log(itemCategoryMap.get("clear_cd_dvd_cases"));
     console.log(itemCategoryMap.get(highestConfidence.label)); 
     sortCategory.innerHTML = "It should go in the " + itemCategoryMap.get(highestConfidence.label) + ".";
+
+    if(itemCategoryMap.get(highestConfidence.label) == "recycling"){
+        recycle.style.display = 'block';
+    }
+    if(itemCategoryMap.get(highestConfidence.label) == "garbage"){
+        garbage.style.display = 'block';
+    }
 
     return(
         console.log("its cooking")
